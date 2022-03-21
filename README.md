@@ -16,7 +16,7 @@ This repository hosts files and code that as an archived library for information
 Information that IS stored in this repository:
 
 * Python scripts to parse files from Winbindex and download them from the Microsoft Symbol Server
-* Golang code to 
+* Golang code to extract extra enrichment data from the binaries
 * Compressed JSON data for each binary file referenced by the binary's SHA256 hash
 
 Information that is NOT stored in this repository:
@@ -29,5 +29,7 @@ Information that is NOT stored in this repository:
 wfi
 ├─── data    (the xz compressed json data for all binaries)
 │
-└─── scripts (python scripts for Winbindex & MS Symbol Server)
+├─── scripts (python scripts for Winbindex & MS Symbol Server)
+│
+└─── enrichment (goland code to add details to binaries)
 ```
