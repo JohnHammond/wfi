@@ -31,5 +31,5 @@ wfi
 │
 ├─── scripts (python scripts for Winbindex & MS Symbol Server)
 │
-└─── enrichment (goland code to add details to binaries)
+└─── enrichment (golang code to add details to binaries)
 ```
