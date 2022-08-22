@@ -8,7 +8,6 @@ import (
   "flag"          //  used for command-line arguments
   "fmt"           // used for output
   gabs "github.com/Jeffail/gabs/v2"
-  "github.com/JohnHammond/masshash/filedata"
   "github.com/ulikunitz/xz" // used to write compressed
   "io"
   "io/fs"
@@ -18,6 +17,7 @@ import (
   "path/filepath"
   "strings"
   "sync" // used for concurrency
+  "wfi/filedata"
 )
 
 var winbindex_dir *string // global

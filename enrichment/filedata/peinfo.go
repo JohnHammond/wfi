@@ -2,10 +2,10 @@ package filedata
 
 import (
 	"fmt"
-	"github.com/JohnHammond/masshash/pe" // from github.com/Velocidex/go-pe
 	"github.com/Velocidex/ordereddict"
 	"os"
 	"path/filepath"
+	"wfi/masshash/pe" // from github.com/Velocidex/go-pe
 )
 
 type FileData struct {

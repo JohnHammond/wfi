@@ -1,0 +1,3 @@
+[submodule "winbindex"]
+	path = winbindex
+	url = https://github.com/m417z/winbindex

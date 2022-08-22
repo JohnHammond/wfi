@@ -13,8 +13,8 @@ import (
 	"os"
 	// "time"
 
-	"github.com/JohnHammond/masshash/slowhash/sha1"
-	"github.com/JohnHammond/masshash/slowhash/sha256"
+	"wfi/masshash/slowhash/sha1"
+	"wfi/masshash/slowhash/sha256"
 )
 
 const (

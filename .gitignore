@@ -1,0 +1,7 @@
+scripts/staging_binaries
+scripts/winbindex_json
+scripts/staging
+
+golang/winbindex_json
+golang/staging_binaries
+golang/winbindex-repo.zip
