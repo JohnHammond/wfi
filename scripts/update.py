@@ -144,15 +144,12 @@ for root, dirs, files in os.walk(WINBINDEX_JSON_DIR):
             new_counter += 1
 
 
-new_counter=20383
 DOWNLOAD_URLS_FILENAME = "download_urls.json"
 sys.stderr.write(f"done!\n[+] we see {new_counter} new hashes to retrieve\n")
 with open(os.path.join(DOWNLOAD_URLS_FILENAME), "w") as filp:
     json.dump(my_json, filp)
 
 
-DOWNLOAD_URLS_FILENAME = "download_urls.json"
-new_counter = 20383
 sys.stderr.write(f"[+] downloading {new_counter} binaries from Microsoft Symbol Server (this may a few hours)...\n")
 
 num_downloaded = 0
