@@ -45,6 +45,14 @@ except FileExistsError:
     sys.stderr.write("folder exists, good to go!\n")
 
 
+sys.stderr.write("[+] creating staging binary dir to pull microsoft binaries... ")
+try:
+    os.mkdir(STAGING_BINARIES_DIR)
+    sys.stderr.write("done!\n")
+except FileExistsError:
+    pass
+    sys.stderr.write("folder exists, good to go!\n")
+
 downloadable_file_extensions = ["exe", "dll", "sys"]
 
 sys.stderr.write(f"[+] going to retrieve file data for only these extensions: {downloadable_file_extensions}\n")
@@ -62,18 +70,7 @@ for ext in downloadable_file_extensions:
     gz_files_list += glob.glob(file_pattern)
 sys.stderr.write(f"done! \n[+] found {len(gz_files_list)} files matching selected extensions.\n")
 
-# This returns a list of the _filenames_. We still need the hashes of each individual
-# binary, so we will have to extract all of these.
-# sys.stderr.write("[+] filtering out previously seen hashes... ")
-# new_hashes = [ os.path.basename(gz_file).split('.')[0] for gz_file in gz_files_list ]
-# print(new_hashes)
-# for each_hash in new_hashes:
-#     if each_hash in previous_hashes:
-#         new_hashes.pop(each_hash)
-
-# sys.stderr.write(f"done!\n[+] found {len(new_hashes)} new hashes to retrieve data for.")
-
-sys.stderr.write("[+] extracting new json data from latest winbindex into staging (this takes a few seconds)...")
+sys.stderr.write("[+] extracting new json data from latest winbindex into staging (this takes a minute or so)...")
 sys.stderr.flush()
 for gz_file in gz_files_list:
     basename = os.path.basename(gz_file)
@@ -146,23 +143,24 @@ for root, dirs, files in os.walk(WINBINDEX_JSON_DIR):
             # sys.stderr.write(f"[+] added hash {key} for {binary_filename}!\n")
             new_counter += 1
 
+
+new_counter=20383
 DOWNLOAD_URLS_FILENAME = "download_urls.json"
 sys.stderr.write(f"done!\n[+] we see {new_counter} new hashes to retrieve\n")
-with open(os.path.join(WINBINDEX_JSON_DIR, DOWNLOAD_URLS_FILENAME), "w") as filp:
+with open(os.path.join(DOWNLOAD_URLS_FILENAME), "w") as filp:
     json.dump(my_json, filp)
 
 
 DOWNLOAD_URLS_FILENAME = "download_urls.json"
 new_counter = 20383
-sys.stderr.write(f"[+] downloading {new_counter} binaries from Microsoft Symbol Server (this may take an hour)...\n")
-num_downloaded = 0
+sys.stderr.write(f"[+] downloading {new_counter} binaries from Microsoft Symbol Server (this may a few hours)...\n")
 
+num_downloaded = 0
+num_missed = 0
 async def process_url(client, queue):
 
     while True:
         count, url, outputname = await queue.get()
-
-        # outputname = url.split("/")[-2] + "_" + line.split("/")[-1]
 
         try:
             async with client.stream("GET", url, follow_redirects=True) as r:
@@ -190,7 +188,7 @@ async def download():
     NTASKS = 300
     limits = httpx.Limits(max_connections=NTASKS + 10)
 
-    j = json.load(open(os.path.join(STAGING_BINARIES_DIR, DOWNLOAD_URLS_FILENAME)))
+    j = json.load(open(os.path.join(DOWNLOAD_URLS_FILENAME)))
 
     async with httpx.AsyncClient(limits=limits, timeout=20) as client:
         # Build background tasks
@@ -211,12 +209,13 @@ async def download():
                         if await aiofiles.ospath.getsize(save_path) > 0:
                             # print(f"NOT downloading {save_filename}")
                             downloaded = True
-                        else:
                             num_downloaded += 1
+                        else:
                             print(
-                                f"{num_downloaded}: EMPTY {save_filename}, re-downloading..."
+                                f"{num_downloaded} downloaded, {num_missed} missed: EMPTY {save_filename}, re-downloading..."
                             )
                             downloaded = False
+                            num_missed += 1
 
                     if not downloaded:
                         await queue.put((0, url, save_path))
@@ -238,7 +237,10 @@ except FileExistsError:
     pass
     sys.stderr.write("folder exists, good to go!\n")
 
+# This will never seem to quit, and may not reach the end here.
+# It might need to be manually stopped after you confirmed all (as much as possible) are downloaded
 asyncio.run(download())
+
 sys.stderr.write("[+] all done downloading binaries!\n")
 sys.stderr.write("[+] now you need to run the golang enrichment:\n")
 sys.stderr.write("     cd ../enrichment\n")
